@@ -1,4 +1,5 @@
 import express from 'express';
+import axios from 'axios';
 
 const app = express();
 const PORT = 3000;
@@ -20,7 +21,7 @@ app.post('/fetch', async (req, res) => {
             const fullUrl = `${url}api/issues/search?components=${component}&p=${currentPage}&ps=${pageSize}&s=SEVERITY`;
             console.log(fullUrl);
 
-            const response = await fetch(fullUrl);
+            const response = await axios.get(fullUrl);
             const data = await response.json();
 
             if (currentPage === 1) {
