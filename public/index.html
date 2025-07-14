@@ -112,7 +112,11 @@
                 while (true) {
                     const fullUrl = `${baseUrl}api/issues/search?components=${component}&p=${currentPage}&ps=${pageSize}&s=SEVERITY`;
 
-                    const response = await fetch(fullUrl);
+                    const response = await fetch(fullUrl, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
                     const data = await response.json();
 
                     if (currentPage === 1) {
