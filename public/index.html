@@ -103,7 +103,7 @@
             const url = document.getElementById('url').value;
             const component = document.getElementById('component').value;
 
-            const res = await fetch('/fetch', {
+            const res = await fetch('https://sonarqube-viewer-production.up.railway.app/fetch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url, component })
