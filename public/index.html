@@ -100,23 +100,46 @@
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const url = document.getElementById('url').value;
+            const baseUrl = document.getElementById('url').value;
             const component = document.getElementById('component').value;
 
-            const res = await fetch('https://sonarqube-viewer-production.up.railway.app/fetch', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, component })
-            });
+            let allIssues = [];
+            let currentPage = 1;
+            const pageSize = 500;
+            let totalIssues = 0;
 
-            console.log(res);
+            try {
+                while (true) {
+                    const fullUrl = `${baseUrl}api/issues/search?components=${component}&p=${currentPage}&ps=${pageSize}&s=SEVERITY`;
 
-            const data = await res.json();
-            latestData = data;
+                    const response = await fetch(fullUrl);
+                    const data = await response.json();
 
-            document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+                    if (currentPage === 1) {
+                        totalIssues = data.total;
+                    }
 
-            document.getElementById('download-btn').style.display = 'inline-block';
+                    allIssues = allIssues.concat(data.issues);
+
+                    if (allIssues.length >= totalIssues) {
+                        break;
+                    }
+
+                    currentPage++;
+                }
+
+                latestData = {
+                    total: totalIssues,
+                    issues: allIssues
+                };
+
+                document.getElementById('output').textContent = JSON.stringify(latestData, null, 2);
+                document.getElementById('download-btn').style.display = 'inline-block';
+
+            } catch (e) {
+                console.error("Gagal fetch dari SonarQube:", e);
+                document.getElementById('output').textContent = 'Error saat fetch data.';
+            }
         });
 
         document.getElementById('download-btn').addEventListener('click', () => {
