@@ -33,6 +33,8 @@ app.post('/fetch', async (req, res) => {
             }
 
             currentPage++;
+
+            console.log(fullUrl);
         }
 
         res.json({
