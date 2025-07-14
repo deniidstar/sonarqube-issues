@@ -138,7 +138,7 @@
 
             } catch (e) {
                 console.error("Gagal fetch dari SonarQube:", e);
-                document.getElementById('output').textContent = 'Error saat fetch data.';
+                document.getElementById('output').textContent = e;
             }
         });
 
