@@ -18,6 +18,8 @@ app.post('/fetch', async (req, res) => {
     try {
         while (true) {
             const fullUrl = `${url}api/issues/search?components=${component}&p=${currentPage}&ps=${pageSize}&s=SEVERITY`;
+            console.log(fullUrl);
+            
             const response = await fetch(fullUrl);
             const data = await response.json();
 
@@ -33,8 +35,6 @@ app.post('/fetch', async (req, res) => {
             }
 
             currentPage++;
-
-            console.log(fullUrl);
         }
 
         res.json({
