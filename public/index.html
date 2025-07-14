@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SonarQube Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: #333;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        pre {
+            margin-top: 30px;
+            background: #111827;
+            color: #d1d5db;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #download-btn{
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>SonarQube Issue Viewer</h2>
+    <form id="login-form">
+        <label>URL:
+            <input id="url" type="text" name="url" value="https://sonarqube.adira.co.id/" required>
+        </label>
+        <label>Component:
+            <input id="component" type="text" name="component"
+                placeholder="contoh: production:telesales:newtelesales-frontend" required>
+        </label>
+        <button type="submit">Ambil Issue</button>
+        <button id="download-btn">Download JSON</button>
+    </form>
+
+    <pre id="output"></pre>
+    
+    <script>
+        let latestData = null;
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = document.getElementById('url').value;
+            const component = document.getElementById('component').value;
+
+            const res = await fetch('/fetch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, component })
+            });
+
+            const data = await res.json();
+            latestData = data;
+
+            document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+
+            document.getElementById('download-btn').style.display = 'inline-block';
+        });
+
+        document.getElementById('download-btn').addEventListener('click', () => {
+            if (!latestData) return;
+
+            const componentInput = document.getElementById('component').value;
+            const safeFilename = componentInput.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+
+            const blob = new Blob([JSON.stringify(latestData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeFilename || 'sonarqube-issues'}.json`;
+            a.click();
+
+            URL.revokeObjectURL(url);
+        });
+
+    </script>
+</body>
+
+</html>
