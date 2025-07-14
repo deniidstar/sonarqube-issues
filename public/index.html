@@ -109,6 +109,8 @@
                 body: JSON.stringify({ url, component })
             });
 
+            console.log(res);
+
             const data = await res.json();
             latestData = data;
 
